@@ -1,0 +1,66 @@
+import binascii
+from random import getrandbits
+
+
+def convert_to_bits(text, encoding='utf-8', errors='surrogatepass'):
+    bits = bin(int(binascii.hexlify(text.encode(encoding, errors)), 16))[2:]
+    return bits.zfill(8 * ((len(bits) + 7) // 8))
+
+
+def gen_random_key(n):
+    """Generates a random key of bits (with 0s or 1s) of length n"""
+    return bin(getrandbits(n))[2:].zfill(n)
+
+
+def xor(m, k):
+    """Given strings m and k of characters 0 or 1,
+    it returns the string representing the XOR
+    between each character in the same position.
+    This means that m and k should be of the same length.
+
+    Use this function both for encrypting and decrypting!"""
+    a = int(m, base=2)
+    b = int(k, base=2)
+    return bin(a ^ b)[2:].zfill(len(m))
+
+
+def bits_originales(m, k):
+    a = int(m, base=2)
+    b = int(k, base=2)
+    binario = bin(a ^ b)
+    print("binario descifrado")
+    return binario[2:].zfill(len(m))
+
+
+def text_from_bits(bits, encoding='utf-8', errors='surrogatepass'):
+    n = int(bits, 2)
+    return int2bytes(n).decode(encoding, errors)
+
+
+def int2bytes(i):
+    hex_string = '%x' % i
+    n = len(hex_string)
+    return binascii.unhexlify(hex_string.zfill(n + (n & 1)))
+
+
+mensaje = "I love you."
+
+bits = convert_to_bits(mensaje)
+print("mensaje: \n")
+print(bits)
+
+key = gen_random_key(len(bits))
+print("relleno: \n")
+print(key)
+
+cipher = xor(bits, key)
+print("cifrado: \n")
+print(cipher)
+
+print("convertit texto")
+bits = bits_originales(key, cipher)
+
+descifrado = text_from_bits(bits)
+print(descifrado)
+
+######https://codereview.stackexchange.com/questions/116044/one-time-pad-algorithm-for-encryption-and-decryption
